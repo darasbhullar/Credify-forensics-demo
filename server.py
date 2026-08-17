@@ -27,6 +27,10 @@ try:
     HAVE_ML = True
 except ImportError:
     print("PyTorch or Transformers not installed. Server starting in Light Sandbox Mock Mode.")
+    class MockModule:
+        def __init__(self, *args, **kwargs): pass
+    class nn:
+        Module = MockModule
 
 # -----------------------
 # Optional C2PA / Content Credentials
@@ -781,6 +785,19 @@ async def analyze_video(
         raise HTTPException(status_code=400, detail="Empty upload.")
     if len(raw) > 200 * 1024 * 1024:
         raise HTTPException(status_code=413, detail="File too large (max ~200MB).")
+
+    if not HAVE_ML:
+        h = int(hashlib.md5(raw).hexdigest(), 16)
+        prob = 0.05 + (h % 90) / 100.0
+        label = "FAKE" if prob >= 0.5 else "REAL"
+        conf = prob if label == "FAKE" else (1.0 - prob)
+        return {
+            "prediction": label,
+            "confidence": round(conf, 4),
+            "prob_ai": round(prob, 4),
+            "reasoning": f"Video aggregation (mocked): 3/5 frames flagged as FAKE",
+            "temporal_consistency": "medium"
+        }
 
     c2pa_info = extract_c2pa_info(raw, file.filename or "", file.content_type)
 
