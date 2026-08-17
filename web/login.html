@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Credify — Partner Demo Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            credify: {
+              dark: '#0a0a0f',
+              surface: '#12121a',
+              surfaceLight: '#1a1a25',
+              accent: '#00d4ff',
+              accentGlow: 'rgba(0, 212, 255, 0.3)',
+              success: '#22c55e',
+              danger: '#ef4444',
+              muted: '#6b7280',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0a0a0f;
+      color: #f9fafb;
+    }
+    .accent-glow-effect {
+      box-shadow: 0 0 40px rgba(0, 212, 255, 0.15);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 overflow-hidden font-sans relative">
+  <!-- Decorative Glow -->
+  <div class="absolute w-[500px] h-[500px] rounded-full bg-credify-accentGlow blur-[120px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+
+  <div class="w-full max-w-md bg-credify-surface border border-white/5 rounded-2xl p-8 accent-glow-effect relative z-10">
+    <div class="flex flex-col items-center mb-8">
+      <!-- Logo placeholder / title -->
+      <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">
+        <span class="text-credify-accent">Credify</span> Demo
+      </h1>
+      <p class="text-sm text-credify-muted text-center">
+        Enter the password to access the media authenticity testing suite.
+      </p>
+    </div>
+
+    <!-- Login Form -->
+    <form action="/login" method="POST" class="space-y-6">
+      <div>
+        <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-credify-muted mb-2">
+          Demo Password
+        </label>
+        <input 
+          type="password" 
+          name="password" 
+          id="password" 
+          placeholder="••••••••" 
+          required 
+          class="w-full px-4 py-3 bg-credify-dark border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-credify-accent focus:ring-1 focus:ring-credify-accent transition duration-200"
+        />
+      </div>
+
+      <!-- Error Message -->
+      <div id="error-container" class="hidden text-sm text-credify-danger bg-credify-danger/10 border border-credify-danger/20 rounded-xl px-4 py-3">
+        Incorrect demo password. Please try again.
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full py-3 bg-credify-accent hover:bg-opacity-90 text-credify-dark font-bold rounded-xl transition duration-200"
+      >
+        Sign In
+      </button>
+    </form>
+    
+    <div class="mt-8 text-center">
+      <a href="/" class="text-xs text-credify-muted hover:text-credify-accent transition duration-150">
+        ← Back to Homepage
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Show error container if the URL contains error=true
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'true') {
+      document.getElementById('error-container').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

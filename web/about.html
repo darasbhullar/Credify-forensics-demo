@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Credify — About</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            credify: {
+              dark: '#0a0a0f',
+              surface: '#12121a',
+              surfaceLight: '#1a1a25',
+              accent: '#00d4ff',
+              accentGlow: 'rgba(0, 212, 255, 0.3)',
+              muted: '#6b7280',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg-page: #0a0a0f;
+      --bg-surface: #12121a;
+      --bg-surface-light: #1a1a25;
+      --fg-primary: #f9fafb;
+      --fg-muted: #9ca3af;
+      --accent: #00d4ff;
+      --accent-glow: rgba(0, 212, 255, 0.3);
+      --border-subtle: rgba(255, 255, 255, 0.03);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-page);
+      color: var(--fg-primary);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Noise overlay */
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Navigation */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem 1.5rem;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-logo {
+      height: 100px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--fg-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Mobile menu */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--fg-primary);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 15, 0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 1rem;
+      z-index: 99;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .mobile-menu a {
+      color: var(--fg-primary);
+      text-decoration: none;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg-surface);
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      padding-top: 90px;
+      max-width: 800px;
+      margin: 0 auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      padding-bottom: 3rem;
+    }
+
+    /* Page header */
+    .page-header {
+      padding: 3rem 0 2rem;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      color: var(--fg-muted);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Content sections */
+    .content-section {
+      margin-bottom: 2rem;
+    }
+
+    .section-text {
+      color: var(--fg-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    .section-text.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-text strong {
+      color: var(--fg-primary);
+      font-weight: 600;
+    }
+
+    /* Premium Feature Icons */
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 1rem;
+      margin-bottom: 0.875rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .feature-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feature-item:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, var(--accent), #0099cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      border-radius: inherit;
+    }
+
+    .feature-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: #0a0a0f;
+      stroke-width: 2;
+      fill: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-content h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.375rem;
+    }
+
+    .feature-content p {
+      color: var(--fg-muted);
+      font-size: 0.875rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* Quote block */
+    .quote-block {
+      background: var(--bg-surface);
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 1rem 1rem 0;
+      margin: 1.5rem 0;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.5s ease;
+    }
+
+    .quote-block.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .quote-text {
+      font-size: 1.125rem;
+      font-style: italic;
+      color: var(--fg-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .quote-author {
+      color: var(--fg-muted);
+      font-size: 0.8125rem;
+    }
+
+    /* Section title */
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: all 0.5s ease;
+    }
+
+    .section-title.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .footer-logo {
+      height: 90px;
+      width: auto;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--fg-primary);
+    }
+
+    .footer-copy {
+      color: var(--fg-muted);
+      font-size: 0.8125rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 80px;
+      }
+
+      .site-header {
+        padding: 0.875rem 1rem;
+      }
+
+      .nav-logo {
+        height: 70px;
+      }
+
+      .nav-links {
+        display: none !important;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .page-header {
+        padding: 2rem 0 1.5rem;
+      }
+
+      .footer-links {
+        gap: 1rem;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu {
+        display: none !important;
+      }
+    }
+  </style>
+
+</head>
+<body>
+  <!-- Noise overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="flex items-center justify-between max-w-7xl mx-auto">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/static/logo.png" alt="Credify" class="nav-logo">
+      </a>
+      <nav class="nav-links flex items-center gap-1">
+        <a href="/app" class="nav-link">App</a>
+        <a href="/how" class="nav-link">How it works</a>
+        <a href="/about" class="nav-link active">About</a>
+        <a href="/privacy" class="nav-link">Privacy</a>
+      </nav>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/">Home</a>
+    <a href="/app">App</a>
+    <a href="/how">How it works</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Why Credify Exists</h1>
+      <p class="page-subtitle">Building trust in an age of synthetic media</p>
+    </div>
+
+    <!-- Introduction -->
+    <section class="content-section">
+      <p class="section-text">
+        Generative AI has made it trivial to create convincing images and videos. That's powerful for creativity, but dangerous for trust. It's getting harder for people and platforms to quickly answer a simple question: <strong>"How real is this?"</strong>
+      </p>
+      <p class="section-text">
+        Credify was built to treat media authenticity as a <strong>security signal</strong>, not a visual judgment. Instead of asking humans to squint at pixels, Credify provides a machine-readable probability that a piece of media was AI-generated, plus context from Content Credentials when they're present.
+      </p>
+    </section>
+
+    <!-- Quote -->
+    <div class="quote-block">
+      <p class="quote-text">"In a world where seeing is no longer believing, we need tools that can verify what our eyes cannot."</p>
+      <p class="quote-author">— The Credify Team</p>
+    </div>
+
+    <!-- What We Aim to Unlock -->
+    <section class="content-section">
+      <h2 class="section-title">What Credify Aims to Unlock</h2>
+      <ul class="feature-list">
+        <li class="feature-item">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Faster Triage</h3>
+            <p>For Trust & Safety teams reviewing user-generated content. Reduce review time with automated risk scoring.</p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Upstream Fraud Signals</h3>
+            <p>For marketplaces, fintech, and identity flows. Detect synthetic media before it enters your pipeline.</p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Better Moderation Tooling</h3>
+            <p>For social products that want "authenticity aware" features. Build trust into your platform's DNA.</p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <div class="feature-content">
+            <h3>Education & Awareness</h3>
+            <p>For journalists, educators, and everyday users learning how AI media behaves. Understand the technology that shapes our world.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Our Approach -->
+    <section class="content-section">
+      <h2 class="section-title">Our Approach</h2>
+      <p class="section-text">
+        Credify combines three specialized streams in a conservative gate ensemble. The pipeline routes inputs through a C2PA cryptographic signature check, a SigLIP-2 and U-Net transposed decoder for semantic anomalies and localization, and a 2D Fast Fourier Transform (FFT) log-magnitude classifier to identify upsampling noise artifacts.
+      </p>
+      <p class="section-text">
+        This dual-stream architecture operates locally on GPU infrastructure, achieving high validation throughput with an average processing latency under 165 milliseconds.
+      </p>
+    </section>
+
+    <!-- Built By -->
+    <section class="content-section">
+      <h2 class="section-title">Built By</h2>
+      <p class="section-text">
+        Credify was built by <strong>Daras Bhullar</strong> as a production-ready demonstration of AI-powered media authenticity detection. The platform is designed to be integrated into existing workflows, not to exist as a standalone demo.
+      </p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <img src="/static/logo.png" alt="Credify" class="footer-logo">
+    <div class="footer-links">
+      <a href="/app" class="footer-link">App</a>
+      <a href="/how" class="footer-link">How it works</a>
+      <a href="/about" class="footer-link">About</a>
+      <a href="/privacy" class="footer-link">Privacy</a>
+    </div>
+    <p class="footer-copy">© <span id="year"></span> Credify · Built by Daras Bhullar</p>
+  </footer>
+
+  <script>
+    // Set year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('active');
+    }
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.remove('active');
+      });
+    });
+
+    // On-enter animations
+    const animateOnEnter = (selector, delay = 0) => {
+      const elements = document.querySelectorAll(selector);
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+            }, index * delay);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      elements.forEach(el => observer.observe(el));
+    };
+
+    animateOnEnter('.section-text', 100);
+    animateOnEnter('.quote-block', 0);
+    animateOnEnter('.section-title', 0);
+    animateOnEnter('.feature-item', 100);
+  </script>
+</body>
+</html>

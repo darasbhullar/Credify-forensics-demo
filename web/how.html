@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Credify — How It Works</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            credify: {
+              dark: '#0a0a0f',
+              surface: '#12121a',
+              surfaceLight: '#1a1a25',
+              accent: '#00d4ff',
+              accentGlow: 'rgba(0, 212, 255, 0.3)',
+              muted: '#6b7280',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --bg-page: #0a0a0f;
+      --bg-surface: #12121a;
+      --bg-surface-light: #1a1a25;
+      --fg-primary: #f9fafb;
+      --fg-muted: #9ca3af;
+      --accent: #00d4ff;
+      --accent-glow: rgba(0, 212, 255, 0.3);
+      --border-subtle: rgba(255, 255, 255, 0.03);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-page);
+      color: var(--fg-primary);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.7;
+    }
+
+    /* Noise overlay */
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Navigation */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem 1.5rem;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-logo {
+      height: 100px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--fg-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Mobile menu */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--fg-primary);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 15, 0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 1rem;
+      z-index: 99;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .mobile-menu a {
+      color: var(--fg-primary);
+      text-decoration: none;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg-surface);
+    }
+
+    /* Main content */
+    .main-content {
+      padding-top: 90px;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      padding-bottom: 4rem;
+    }
+
+    /* Page header */
+    .page-header {
+      padding: 3rem 0 2rem;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      color: var(--fg-muted);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Steps */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin: 2.5rem 0;
+    }
+
+    .step-card {
+      display: flex;
+      gap: 1.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .step-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .step-card:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Premium Step Number */
+    .step-number {
+      width: 52px;
+      height: 52px;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, var(--accent), #0099cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: #0a0a0f;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-number::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      border-radius: inherit;
+    }
+
+    .step-number span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-content h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.625rem;
+    }
+
+    .step-content p {
+      color: var(--fg-muted);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .step-content strong {
+      color: var(--fg-primary);
+      font-weight: 600;
+    }
+
+    /* Model cards */
+    .models-section {
+      margin: 3rem 0;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .model-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .model-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .model-card:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    /* Premium Model Badge */
+    .model-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #0099cc);
+      color: #0a0a0f;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 0.375rem 0.875rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .model-card h4 {
+      font-size: 1.0625rem;
+      font-weight: 600;
+      margin-bottom: 0.625rem;
+    }
+
+    .model-card p {
+      color: var(--fg-muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Practice section */
+    .practice-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      margin: 2.5rem 0;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    .practice-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .practice-section h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .practice-section p {
+      color: var(--fg-muted);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      margin: 3rem 0;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #0a0a0f;
+      padding: 0.875rem 1.75rem;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 40px var(--accent-glow);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 60px var(--accent-glow);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .footer-logo {
+      height: 90px;
+      width: auto;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--fg-primary);
+    }
+
+    .footer-copy {
+      color: var(--fg-muted);
+      font-size: 0.8125rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 80px;
+      }
+
+      .site-header {
+        padding: 0.875rem 1rem;
+      }
+
+      .nav-logo {
+        height: 70px;
+      }
+
+      .nav-links {
+        display: none !important;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .page-header {
+        padding: 2rem 0 1.5rem;
+      }
+
+      .step-card {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem;
+      }
+
+      .step-number {
+        width: 44px;
+        height: 44px;
+        font-size: 1.125rem;
+      }
+
+      .models-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .model-card {
+        padding: 1.25rem;
+      }
+
+      .practice-section {
+        padding: 1.25rem;
+      }
+
+      .footer-links {
+        gap: 1rem;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu {
+        display: none !important;
+      }
+    }
+  </style>
+
+</head>
+<body>
+  <!-- Noise overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="flex items-center justify-between max-w-7xl mx-auto">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/static/logo.png" alt="Credify" class="nav-logo">
+      </a>
+      <nav class="nav-links flex items-center gap-1">
+        <a href="/app" class="nav-link">App</a>
+        <a href="/how" class="nav-link active">How it works</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/privacy" class="nav-link">Privacy</a>
+      </nav>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/">Home</a>
+    <a href="/app">App</a>
+    <a href="/how">How it works</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">How Credify Works</h1>
+      <p class="page-subtitle">From upload to verdict in four steps</p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps-container">
+      <div class="step-card">
+        <div class="step-number"><span>1</span></div>
+        <div class="step-content">
+          <h3>You Upload Media</h3>
+          <p>The app accepts <strong>JPEG/PNG/WebP images</strong> and <strong>short video clips</strong>. Files are processed locally — there's no external API call. For videos, a handful of frames are sampled across the clip instead of analyzing every frame, making the process fast and efficient.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number"><span>2</span></div>
+        <div class="step-content">
+          <h3>Three Specialized Streams Score the Content</h3>
+          <p>The file is evaluated along three parallel paths: cryptographic credentials checks (Stream A), semantic Vision Transformer patch segmentation (Stream B), and high-frequency Fourier transform noise scans (Stream C).</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number"><span>3</span></div>
+        <div class="step-content">
+          <h3>Content Credentials Are Checked</h3>
+          <p>If the file carries valid <strong>C2PA Content Credentials</strong> signatures (Stream A), the system verifies the trust chain. When provenance matches authoritative generators or cameras, it registers a fast-path verdict immediately.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number"><span>4</span></div>
+        <div class="step-content">
+          <h3>Scores Are Fused Into a Verdict</h3>
+          <p>Classification logits and frequency maps are blended into a unified AI probability. If the final score exceeds 0.5, the media is flagged as <strong>FAKE</strong>. You also get a detailed spatial heatmap highlighting manipulated zones.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Models Section -->
+    <section class="models-section">
+      <h2 class="section-title">The Three Forensic Streams</h2>
+      <div class="models-grid">
+        <div class="model-card">
+          <span class="model-badge">Stream A</span>
+          <h4>Provenance SCAN</h4>
+          <p>Performs binary checks for cryptographic JUMBF metadata headers, verifying digital signatures from creators or camera hardware (Leica, Sony, Adobe, OpenAI).</p>
+        </div>
+        <div class="model-card">
+          <span class="model-badge">Stream B</span>
+          <h4>Spatial Forensics</h4>
+          <p>Feeds inputs to a SigLIP-2 ViT encoder. A custom convolutional U-Net transposed decoder maps hidden patch states to pixel-level manipulation heatmaps.</p>
+        </div>
+        <div class="model-card">
+          <span class="model-badge">Stream C</span>
+          <h4>Frequency Forensics</h4>
+          <p>Extracts grayscale log-magnitude spectra using a 2D Fast Fourier Transform (FFT) and projects frequency grids into a ResNet-50 to catch upsampling artifacts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Practice Section -->
+    <div class="practice-section">
+      <h3>Using This in Practice</h3>
+      <p>In a production setting, Credify's output would be one input into a larger decision engine — combined with policy rules, user history, and human review. The system is designed to be an upstream risk signal, not a final verdict.</p>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <a href="/app" class="cta-button">
+        <span>DEMO ACCESS</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <img src="/static/logo.png" alt="Credify" class="footer-logo">
+    <div class="footer-links">
+      <a href="/app" class="footer-link">App</a>
+      <a href="/how" class="footer-link">How it works</a>
+      <a href="/about" class="footer-link">About</a>
+      <a href="/privacy" class="footer-link">Privacy</a>
+    </div>
+    <p class="footer-copy">© <span id="year"></span> Credify · Built by Daras Bhullar</p>
+  </footer>
+
+  <script>
+    // Set year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('active');
+    }
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.remove('active');
+      });
+    });
+
+    // Step cards - on-enter animation with stagger
+    const stepCards = document.querySelectorAll('.step-card');
+    
+    const stepObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 150);
+          stepObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    stepCards.forEach(card => stepObserver.observe(card));
+
+    // Model cards - on-enter animation with stagger
+    const modelCards = document.querySelectorAll('.model-card');
+    
+    const modelObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+          modelObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    modelCards.forEach(card => modelObserver.observe(card));
+
+    // Practice section - on-enter animation
+    const practiceSection = document.querySelector('.practice-section');
+    
+    const practiceObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          practiceObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    practiceObserver.observe(practiceSection);
+  </script>
+</body>
+</html>

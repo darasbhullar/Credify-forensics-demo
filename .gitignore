@@ -1,0 +1,32 @@
+# Environments & Secrets
+.env
+.venv/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Model Weights
+*.pth
+*.pt
+*.bin
+models/
+siglip2-finetuned/
+resnet-freq-finetuned/
+
+# Data & CSV files
+data/
+*.csv
+
+# Logs
+*.log
+tmp/
+temp/

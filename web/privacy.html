@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Credify — Privacy</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            credify: {
+              dark: '#0a0a0f',
+              surface: '#12121a',
+              surfaceLight: '#1a1a25',
+              accent: '#00d4ff',
+              accentGlow: 'rgba(0, 212, 255, 0.3)',
+              muted: '#6b7280',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg-page: #0a0a0f;
+      --bg-surface: #12121a;
+      --bg-surface-light: #1a1a25;
+      --fg-primary: #f9fafb;
+      --fg-muted: #9ca3af;
+      --accent: #00d4ff;
+      --accent-glow: rgba(0, 212, 255, 0.3);
+      --border-subtle: rgba(255, 255, 255, 0.03);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-page);
+      color: var(--fg-primary);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Noise overlay */
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Navigation */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem 1.5rem;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-logo {
+      height: 100px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--fg-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Mobile menu */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--fg-primary);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 15, 0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 1rem;
+      z-index: 99;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .mobile-menu a {
+      color: var(--fg-primary);
+      text-decoration: none;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg-surface);
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      padding-top: 90px;
+      max-width: 800px;
+      margin: 0 auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      padding-bottom: 3rem;
+    }
+
+    /* Page header */
+    .page-header {
+      padding: 3rem 0 2rem;
+    }
+
+    .page-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-intro {
+      color: var(--fg-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* Privacy sections */
+    .privacy-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    .privacy-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Premium Section Header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 0.625rem;
+      background: linear-gradient(135deg, var(--accent), #0099cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      border-radius: inherit;
+    }
+
+    .section-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: #0a0a0f;
+      stroke-width: 2;
+      fill: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .privacy-section h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .privacy-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .privacy-list li {
+      color: var(--fg-muted);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      padding: 0.75rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .privacy-list li:last-child {
+      border-bottom: none;
+    }
+
+    .privacy-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .privacy-text {
+      color: var(--fg-muted);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .footer-logo {
+      height: 90px;
+      width: auto;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--fg-primary);
+    }
+
+    .footer-copy {
+      color: var(--fg-muted);
+      font-size: 0.8125rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 80px;
+      }
+
+      .site-header {
+        padding: 0.875rem 1rem;
+      }
+
+      .nav-logo {
+        height: 70px;
+      }
+
+      .nav-links {
+        display: none !important;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .page-header {
+        padding: 2rem 0 1.5rem;
+      }
+
+      .privacy-section {
+        padding: 1.25rem;
+      }
+
+      .section-icon {
+        width: 32px;
+        height: 32px;
+      }
+
+      .section-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .privacy-section h2 {
+        font-size: 1rem;
+      }
+
+      .footer-links {
+        gap: 1rem;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Noise overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="flex items-center justify-between max-w-7xl mx-auto">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/static/logo.png" alt="Credify" class="nav-logo">
+      </a>
+      <nav class="nav-links flex items-center gap-1">
+        <a href="/app" class="nav-link">App</a>
+        <a href="/how" class="nav-link">How it works</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/privacy" class="nav-link active">Privacy</a>
+      </nav>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/">Home</a>
+    <a href="/app">App</a>
+    <a href="/how">How it works</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Privacy</h1>
+      <p class="page-intro">This portal is a prototype and focuses on the detection behaviour rather than full legal terms. The notes below describe how the demo handles your uploads.</p>
+    </div>
+
+    <!-- How Uploads Are Used -->
+    <section class="privacy-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2>How Uploads Are Used</h2>
+      </div>
+      <ul class="privacy-list">
+        <li>Your images and videos are used only to run the Credify detection models inside this server.</li>
+        <li>No attempt is made to identify people in your media.</li>
+        <li>Content Credentials (C2PA) are read only to understand the file's provenance claims.</li>
+      </ul>
+    </section>
+
+    <!-- Storage -->
+    <section class="privacy-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <h2>Storage</h2>
+      </div>
+      <ul class="privacy-list">
+        <li>All uploaded media is processed in-memory and discarded immediately upon response completion.</li>
+        <li>This demo does not write uploads to disk or persist them long-term.</li>
+      </ul>
+    </section>
+
+    <!-- Integration -->
+    <section class="privacy-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </div>
+        <h2>If You Integrate Credify Yourself</h2>
+      </div>
+      <p class="privacy-text">
+        If Credify is integrated into your own product stack, you can apply your own logging, retention, and compliance policies around uploads and scores. This portal is meant to showcase the detection behaviour, not provide legal advice.
+      </p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <img src="/static/logo.png" alt="Credify" class="footer-logo">
+    <div class="footer-links">
+      <a href="/app" class="footer-link">App</a>
+      <a href="/how" class="footer-link">How it works</a>
+      <a href="/about" class="footer-link">About</a>
+      <a href="/privacy" class="footer-link">Privacy</a>
+    </div>
+    <p class="footer-copy">© <span id="year"></span> Credify · Built by Daras Bhullar</p>
+  </footer>
+
+  <script>
+    // Set year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('active');
+    }
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.remove('active');
+      });
+    });
+
+    // On-enter animations
+    const privacySections = document.querySelectorAll('.privacy-section');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    privacySections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>
